@@ -14,7 +14,11 @@ class VeiculoService(
 
 ) {
     fun getVeiculo(id: Long): Veiculo {
-        return veiculoHttp.findById(id)
+        val veiculo = veiculoHttp.findById(id)
+        gravarCache(veiculo)
+        return veiculo
+
+
     }
     fun gravarCache(veiculo: Veiculo) {
         val jedisPool = JedisPool(JedisPoolConfig(), "1270.0.01", 6379)
