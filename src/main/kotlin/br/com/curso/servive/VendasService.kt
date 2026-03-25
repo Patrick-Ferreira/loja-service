@@ -11,7 +11,6 @@ import java.time.LocalDateTime
 class VendasService(
         private val veiculoService: VeiculoService
 ) {
-
     fun realizarVenda(vendasInput: VendasInput) {
         val veiculo = veiculoService.getVeiculo(vendasInput.veiculo)
         var parcelas: List<Parcela> = ArrayList<Parcela>()
