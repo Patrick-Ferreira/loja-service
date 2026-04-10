@@ -4,14 +4,18 @@ import br.com.curso.dto.input.VendasInput
 import br.com.curso.dto.output.Parcela
 import br.com.curso.dto.output.Venda
 import br.com.curso.http.VeiculoHttp
+import br.com.curso.producer.VendaProducer
+import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.inject.Singleton
 import java.time.LocalDateTime
 
 @Singleton
 class VendasService(
-        private val veiculoService: VeiculoService
+        private val veiculoService: VeiculoService,
+        private val vendaProducer: VendaProducer,
+        private val objectMapper: ObjectMapper
 ) {
-    fun realizarVenda(vendasInput: VendasInput) {
+    fun realizarVenda(vendasInput: VendasInput): Venda {
         val veiculo = veiculoService.getVeiculo(vendasInput.veiculo)
         var parcelas: List<Parcela> = ArrayList<Parcela>()
         var valorParcela = vendasInput.valor.divide(vendasInput.qtdParcelas.toBigDecimal())
@@ -23,6 +27,14 @@ class VendasService(
             dataVencimento = dataVencimento.plusMonths(1)
         }
         var venda= Venda(vendasInput.cliente, veiculo, vendasInput.valor, parcelas)
+
         println( venda)
+        confirmarVenda(venda)
+        return venda
+
+    }
+    fun confirmarVenda(venda: Venda) {
+        val vendaJSON = objectMapper.writeValueAsString(venda)
+        vendaProducer.publicarVenda(venda.veiculo.id.toString(), vendaJSON )
     }
 }
